@@ -1,0 +1,18 @@
+version: "3.2"
+
+services:
+  mongo:
+    image: mongo:4.2.8
+    ports:
+      - "27017-27019:27017-27019"
+    environment:
+      MONGO_INITDB_ROOT_DATABASE: "smart_db"
+      MONGO_INITDB_ROOT_USERNAME: "root"
+      MONGO_INITDB_ROOT_PASSWORD: "123qwe"
+    networks:
+      back:
+        aliases:
+          - "mongodb.service.com.br"
+
+networks:
+  back:
