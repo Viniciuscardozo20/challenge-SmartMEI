@@ -2,7 +2,9 @@ package database
 
 import (
 	"errors"
+	"time"
 
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
@@ -11,105 +13,142 @@ type collection struct {
 }
 
 func newCollection(name string, db mongo.Database) (*collection, error) {
-	names, err := db.ListCollectionNames(nil, nil)
+	coll := db.Collection(name, nil)
+	_, err := coll.InsertOne(nil, bson.M{"Test": "init"})
 	if err != nil {
 		return nil, err
 	}
-	exist := false
-	for _, collName := range names {
-		if collName == name {
-			exist = true
-			break
-		}
-	}
-	if !exist {
-		err := db.CreateCollection(nil, name)
-		if err != nil {
-			return nil, err
-		}
-	}
-	coll := db.Collection(name, nil)
 	return &collection{
 		coll: coll,
 	}, nil
 }
 
-func (c *collection) CreateUser(data User) (interface{}, error) {
+func (c *collection) CreateUser(data User) (*User, error) {
 	result, err := c.coll.InsertOne(nil, data)
 	if err != nil {
 		return nil, err
 	}
-	return result.InsertedID, nil
+	user, err := c.findUser(result.InsertedID, "_id")
+	if err != nil {
+		return nil, err
+	}
+	return user, nil
 }
 
-func (c *collection) AddBookToMyCollection(loggedUserId int, data Book) (interface{}, error) {
-	err := c.loggedUserbyID(loggedUserId)
+func (c *collection) AddBookToMyCollection(loggedUserId int, data Book) (*Book, error) {
+	user, err := c.findUser(loggedUserId, "id")
 	if err != nil {
 		return nil, err
 	}
-	result, err := c.coll.InsertOne(nil, data)
+	user.Collection = append(user.Collection, data)
+	result := c.coll.FindOneAndUpdate(nil, bson.M{"id": loggedUserId}, bson.M{"$set": user})
+	if result.Err() != nil {
+		return nil, result.Err()
+	}
+	var userR User
+	err = result.Decode(&userR)
 	if err != nil {
 		return nil, err
 	}
-	return result.InsertedID, nil
+	return &data, nil
 }
 
-func (c *collection) LendBook(loggedUserId int, data Book) (interface{}, error) {
-	err := c.loggedUserbyID(loggedUserId)
+func (c *collection) LendBook(loggedUserId int, data BookLoan) (*BookLoan, error) {
+	user, err := c.findUser(loggedUserId, "id")
 	if err != nil {
 		return nil, err
 	}
-	_, err = c.borrowedBook(data.Id)
+	toUser, err := c.findUser(data.ToUser, "id")
 	if err != nil {
 		return nil, err
 	}
-	inserted, err := c.coll.InsertOne(nil, data)
-	if err != nil {
-		return nil, err
+	exists := false
+	for _, book := range user.Collection {
+		if book.Id == data.Book.Id {
+			exists = true
+		}
 	}
-	return inserted.InsertedID, nil
+	if exists != true {
+		return nil, errors.New("You don't have this book")
+	}
+	for _, lbook := range user.LentBooks {
+		if lbook.Book.Id == data.Book.Id {
+			if lbook.Returned != true {
+				return nil, errors.New("Book's already loan.")
+			}
+		}
+	}
+	user.LentBooks = append(user.LentBooks, data)
+	toUser.BorrowedBooks = append(toUser.BorrowedBooks, data)
+
+	result := c.coll.FindOneAndUpdate(nil, bson.M{"id": loggedUserId}, bson.M{"$set": user})
+	if result.Err() != nil {
+		return nil, result.Err()
+	}
+	result = c.coll.FindOneAndUpdate(nil, bson.M{"id": toUser.Id}, bson.M{"$set": toUser})
+	if result.Err() != nil {
+		return nil, result.Err()
+	}
+
+	return &data, nil
 }
 
 func (c *collection) ReturnBook(loggedUserId int, bookId int) (*BookLoan, error) {
-	err := c.loggedUserbyID(loggedUserId)
+	user, err := c.findUser(loggedUserId, "id")
 	if err != nil {
 		return nil, err
 	}
-	bookLoan, err := c.borrowedBook(bookId)
-	if err != nil {
-		return nil, err
+	exists := false
+	for _, book := range user.BorrowedBooks {
+		if book.Book.Id == bookId {
+			exists = true
+		}
 	}
-	result := c.coll.FindOneAndUpdate(nil, bookLoan.Id, bookLoan)
-	if result.Err() != nil {
-		return nil, result.Err()
-	}
-	err = result.Decode(&bookLoan)
-	if err != nil {
-		return nil, err
-	}
-	return bookLoan, nil
-}
-
-func (c *collection) loggedUserbyID(id int) error {
-	result := c.coll.FindOne(nil, id)
-	if result.Err() != nil {
-		return result.Err()
-	}
-	return nil
-}
-
-func (c *collection) borrowedBook(id int) (*BookLoan, error) {
-	result := c.coll.FindOne(nil, id)
-	if result.Err() != nil {
-		return nil, result.Err()
+	if exists != true {
+		return nil, errors.New("You don't have this book")
 	}
 	var bookLoan BookLoan
-	err := result.Decode(&bookLoan)
+	for i, lbook := range user.BorrowedBooks {
+		if lbook.Book.Id == bookId {
+			if lbook.Returned == true {
+				return nil, errors.New("Book's already returned.")
+			}
+			user.BorrowedBooks[i].ReturnedAt = time.Now()
+			user.BorrowedBooks[i].Returned = true
+			bookLoan = user.BorrowedBooks[i]
+		}
+	}
+	fromUser, err := c.findUser(bookLoan.FromUser, "id")
 	if err != nil {
 		return nil, err
 	}
-	if bookLoan.Returned != true {
-		return nil, errors.New("book's already loan.")
+
+	for i, lbook := range fromUser.LentBooks {
+		if lbook.Book.Id == bookId {
+			fromUser.LentBooks[i] = bookLoan
+		}
 	}
+	result := c.coll.FindOneAndUpdate(nil, bson.M{"id": user.Id}, bson.M{"$set": user})
+	if result.Err() != nil {
+		return nil, result.Err()
+	}
+	result = c.coll.FindOneAndUpdate(nil, bson.M{"id": fromUser.Id}, bson.M{"$set": fromUser})
+	if result.Err() != nil {
+		return nil, result.Err()
+	}
+
 	return &bookLoan, nil
+}
+
+func (c *collection) findUser(input interface{}, field string) (*User, error) {
+	result := c.coll.FindOne(nil, bson.M{field: input})
+	if result.Err() != nil {
+		return nil, result.Err()
+	}
+	var user User
+	err := result.Decode(&user)
+	if err != nil {
+		return nil, err
+	}
+	return &user, nil
 }

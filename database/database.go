@@ -13,12 +13,12 @@ type driver struct {
 
 func NewDatabase(config Config) (Database, error) {
 	client, err := mongo.Connect(nil, options.Client().
-		ApplyURI(fmt.Sprintf("mongodb://%s:%d", config.Host, config.Port)).
-		SetAuth(options.Credential{
-			Username: config.User,
-			Password: config.Password,
-		}),
+		ApplyURI(fmt.Sprintf("mongodb://%s:%d/?connect=direct", config.Host, config.Port)),
 	)
+	if err != nil {
+		return nil, err
+	}
+	err = client.Ping(nil, nil)
 	if err != nil {
 		return nil, err
 	}
