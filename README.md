@@ -258,4 +258,4 @@ _Status http_: `200 OK`
 # Contato
 
 E-mail: viniiciuscardozo@gmail.com
-LinkedIn: https://www.linkedin.com/in/ednailsonvb/
+LinkedIn: https://www.linkedin.com/in/vinicius-cardozo-669a15136/
