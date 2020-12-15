@@ -1,16 +1,18 @@
 package database
 
 import (
+	. "challenge-SmartMEI/database/models"
+	. "challenge-SmartMEI/helper_tests"
+	"fmt"
+	"math/rand"
 	"testing"
 	"time"
-
-	. "challenge-SmartMEI/helper_tests"
 
 	. "github.com/onsi/gomega"
 	"go.mongodb.org/mongo-driver/bson"
 )
 
-const testCollection = "test-collection-10"
+const testCollection = "test-collection-23"
 
 func TestCollection(t *testing.T) {
 	g := NewGomegaWithT(t)
@@ -40,10 +42,11 @@ func TestCollection(t *testing.T) {
 	t.Run("validate the user creation", func(t *testing.T) {
 		coll, err := db.Collection(testCollection)
 		g.Expect(err).ShouldNot(HaveOccurred())
+		rand := rand.Intn(80000-1+1) + 1
 		user, err := coll.CreateUser(User{
-			Id:            01,
-			Name:          "test6",
-			Email:         "test1@email",
+			Name:          "testCreate",
+			Email:         fmt.Sprint("test0@email.com", rand),
+			Collection:    make([]Book, 0),
 			LentBooks:     make([]BookLoan, 0),
 			BorrowedBooks: make([]BookLoan, 0),
 			CreatedAt:     time.Now(),
@@ -55,8 +58,18 @@ func TestCollection(t *testing.T) {
 	t.Run("validate add book in user collection", func(t *testing.T) {
 		coll, err := db.Collection(testCollection)
 		g.Expect(err).ShouldNot(HaveOccurred())
-		book, err := coll.AddBookToMyCollection(01, Book{
-			Id:        04,
+		rand := rand.Intn(80000-1+1) + 1
+		user, err := coll.CreateUser(User{
+			Name:          "testAdd",
+			Email:         fmt.Sprint("test1@email.com", rand), //generate new email
+			Collection:    make([]Book, 0),
+			LentBooks:     make([]BookLoan, 0),
+			BorrowedBooks: make([]BookLoan, 0),
+			CreatedAt:     time.Now(),
+		})
+		g.Expect(err).ShouldNot(HaveOccurred())
+		g.Expect(user).ShouldNot(BeNil())
+		book, err := coll.AddBookToMyCollection(*user, Book{
 			Title:     "Title-test-4",
 			Pages:     "99",
 			CreatedAt: time.Now(),
@@ -68,33 +81,39 @@ func TestCollection(t *testing.T) {
 	t.Run("validate lend book", func(t *testing.T) {
 		coll, err := db.Collection(testCollection)
 		g.Expect(err).ShouldNot(HaveOccurred())
-		_, err = coll.CreateUser(User{
-			Id:            40,
-			Name:          "test89",
-			Email:         "test1@email",
+		user1, err := coll.CreateUser(User{
+			Name:          "testAdd",
+			Email:         fmt.Sprint("test1@email.com", rand.Intn(80000-1)+1), //generate new email
+			Collection:    make([]Book, 0),
 			LentBooks:     make([]BookLoan, 0),
 			BorrowedBooks: make([]BookLoan, 0),
 			CreatedAt:     time.Now(),
 		})
-		_, err = coll.CreateUser(User{
-			Id:            41,
-			Name:          "test90",
-			Email:         "test1@email",
+		g.Expect(err).ShouldNot(HaveOccurred())
+		g.Expect(user1).ShouldNot(BeNil())
+		user2, err := coll.CreateUser(User{
+			Name:          "testAdd",
+			Email:         fmt.Sprint("test1@email.com", rand.Intn(80000-1)+1), //generate new email
+			Collection:    make([]Book, 0),
 			LentBooks:     make([]BookLoan, 0),
 			BorrowedBooks: make([]BookLoan, 0),
 			CreatedAt:     time.Now(),
 		})
-		book, err := coll.AddBookToMyCollection(40, Book{
-			Id:        1,
-			Title:     "Title-test",
-			Pages:     "589",
+		g.Expect(err).ShouldNot(HaveOccurred())
+		g.Expect(user2).ShouldNot(BeNil())
+		book, err := coll.AddBookToMyCollection(*user1, Book{
+			Title:     "Title-test-4-lend",
+			Pages:     "99",
 			CreatedAt: time.Now(),
 		})
-		bookLoan, err := coll.LendBook(40, BookLoan{
+		g.Expect(err).ShouldNot(HaveOccurred())
+		g.Expect(book).ShouldNot(BeNil())
+		bookLoan, err := coll.LendBook(*user1, *user2, BookLoan{
 			Book:     *book,
-			FromUser: 40,
-			ToUser:   41,
+			FromUser: user1.Id,
+			ToUser:   user2.Id,
 			LentAt:   time.Now(),
+			Returned: false,
 		})
 		g.Expect(err).ShouldNot(HaveOccurred())
 		g.Expect(bookLoan).ShouldNot(BeNil())
@@ -103,37 +122,52 @@ func TestCollection(t *testing.T) {
 	t.Run("validate returned book", func(t *testing.T) {
 		coll, err := db.Collection(testCollection)
 		g.Expect(err).ShouldNot(HaveOccurred())
-		_, err = coll.CreateUser(User{
-			Id:            20,
-			Name:          "test89",
-			Email:         "test1@email",
+		user1, err := coll.CreateUser(User{
+			Name:          "testAdd",
+			Email:         fmt.Sprint("test1@email.com", rand.Intn(80000-1)+1), //generate new email
+			Collection:    make([]Book, 0),
 			LentBooks:     make([]BookLoan, 0),
 			BorrowedBooks: make([]BookLoan, 0),
 			CreatedAt:     time.Now(),
 		})
-		_, err = coll.CreateUser(User{
-			Id:            21,
-			Name:          "test90",
-			Email:         "test1@email",
+		g.Expect(err).ShouldNot(HaveOccurred())
+		g.Expect(user1).ShouldNot(BeNil())
+		user2, err := coll.CreateUser(User{
+			Name:          "testAdd",
+			Email:         fmt.Sprint("test1@email.com", rand.Intn(80000-1)+1), //generate new email
+			Collection:    make([]Book, 0),
 			LentBooks:     make([]BookLoan, 0),
 			BorrowedBooks: make([]BookLoan, 0),
 			CreatedAt:     time.Now(),
 		})
-		book, err := coll.AddBookToMyCollection(20, Book{
-			Id:        1,
-			Title:     "Title-test",
-			Pages:     "589",
+		g.Expect(err).ShouldNot(HaveOccurred())
+		g.Expect(user2).ShouldNot(BeNil())
+		book, err := coll.AddBookToMyCollection(*user1, Book{
+			Title:     "Title-test-4-lend",
+			Pages:     "99",
 			CreatedAt: time.Now(),
 		})
-		bookLoan, err := coll.LendBook(20, BookLoan{
+		g.Expect(err).ShouldNot(HaveOccurred())
+		g.Expect(book).ShouldNot(BeNil())
+		bookLoan, err := coll.LendBook(*user1, *user2, BookLoan{
 			Book:     *book,
-			FromUser: 20,
-			ToUser:   21,
+			FromUser: user1.Id,
+			ToUser:   user2.Id,
 			LentAt:   time.Now(),
+			Returned: false,
 		})
-		bookLoan, err = coll.ReturnBook(21, *&book.Id)
 		g.Expect(err).ShouldNot(HaveOccurred())
 		g.Expect(bookLoan).ShouldNot(BeNil())
+		user1, err = coll.GetUserDetails(user1.Id)
+		g.Expect(err).ShouldNot(HaveOccurred())
+		g.Expect(user1).ShouldNot(BeNil())
+		user1.LentBooks[0].Returned = true
+		user2, err = coll.GetUserDetails(user2.Id)
+		g.Expect(err).ShouldNot(HaveOccurred())
+		g.Expect(user2).ShouldNot(BeNil())
+		user2.BorrowedBooks[0].Returned = true
+		err = coll.ReturnBook(*user2, *user1)
+		g.Expect(err).ShouldNot(HaveOccurred())
 	})
 
 }

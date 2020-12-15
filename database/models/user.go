@@ -1,9 +1,9 @@
-package database
+package models
 
 import "time"
 
 type User struct {
-	Id            int        `json:"id"`
+	Id            int        `json:"_id"`
 	Name          string     `json:"name"`
 	Email         string     `json:"email"`
 	CreatedAt     time.Time  `json:"pages"`

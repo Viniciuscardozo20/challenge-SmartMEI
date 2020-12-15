@@ -1,9 +1,8 @@
-package database
+package models
 
 import "time"
 
 type BookLoan struct {
-	Id         int       `json:"id"`
 	Book       Book      `json:"book"`
 	FromUser   int       `json:"fromUser"`
 	ToUser     int       `json:"toUser"`
