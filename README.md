@@ -19,7 +19,7 @@ Isso subira o banco de dados na porta 27017.
 
 ## Iniciando o projeto
 
-Após subir o banco de dados, para iniciar o projeto basta roda o seguinte comando no caminho raiz.
+Após subir o banco de dados, para iniciar o projeto basta rodar o seguinte comando no caminho raiz.
 
     go run main.go run
 
@@ -27,7 +27,7 @@ O servidor HTTP está rodando localmente na porta `8082`
 
 ## Endpoints
 
-### Conversão
+### Pegar dadas de um usuário
 
 METÓDO `GET`v1/
 
