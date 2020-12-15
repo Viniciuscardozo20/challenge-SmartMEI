@@ -15,7 +15,7 @@ Após clonar o repositório, é necessário ir no caminho raiz e rodar o seguint
 
     docker-compose up
 
-Isso subira o banco de dados na porta 27017.
+Isso subirá o banco de dados na porta 27017.
 
 ## Iniciando o projeto
 
@@ -27,7 +27,7 @@ O servidor HTTP está rodando localmente na porta `8082`
 
 ## Endpoints
 
-### Pegar dadas de um usuário
+### Pegar dados de um usuário
 
 METÓDO `GET`v1/
 
@@ -288,7 +288,7 @@ _Status http_: `200 OK`
 }
 ```
 
-### Requirementos
+### Requerementos
 
 * GoLang 1:15
 

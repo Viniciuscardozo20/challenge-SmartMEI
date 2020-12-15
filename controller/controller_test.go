@@ -22,7 +22,6 @@ func TestController(t *testing.T) {
 	g.Expect(err).ShouldNot(HaveOccurred())
 	t.Run("validate the user creation", func(t *testing.T) {
 		user, err := coll.CreateUser(User{
-			Id:            "12",
 			Name:          "test6",
 			Email:         "test1@email",
 			LentBooks:     make([]BookLoan, 0),
