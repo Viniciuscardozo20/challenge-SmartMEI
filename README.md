@@ -288,8 +288,6 @@ _Status http_: `200 OK`
 }
 ```
 
-## Running tests
-
 ### Requirementos
 
 * GoLang 1:15
