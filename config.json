@@ -1,1 +1,1 @@
-{"log_level":0,"port":9000,"database":{"config":{"host":"localhost","port":27017,"user":"root","password":"123qwe","database":"smartMei-db"},"user_collection":"user-collection-1"}}
+{"log_level":0,"port":9000,"database":{"config":{"host":"localhost","port":27017,"user":"root","password":"123qwe","database":"smartMei-db"},"user_collection":"user-collection-2"}}

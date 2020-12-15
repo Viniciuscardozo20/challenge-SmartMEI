@@ -2,7 +2,6 @@ package getUser
 
 import (
 	"challenge-SmartMEI/controller"
-	"strconv"
 
 	httping "github.com/ednailson/httping-go"
 	"github.com/go-playground/validator/v10"
@@ -17,11 +16,7 @@ func NewHandler(ctl controller.Controller) *Handler {
 }
 
 func (c *Handler) Handle(request httping.HttpRequest) httping.IResponse {
-	userId, err := strconv.Atoi(request.Params["userid"])
-	if err != nil {
-		return httping.BadRequest(map[string]string{"body": err.Error()})
-	}
-	user, err := c.ctl.GetUserDetails(userId)
+	user, err := c.ctl.GetUserDetails(request.Params["userid"])
 	if err != nil {
 		return httping.InternalServerError("Error to get user")
 	}

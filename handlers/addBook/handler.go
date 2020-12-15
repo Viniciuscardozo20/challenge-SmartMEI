@@ -4,7 +4,6 @@ import (
 	"challenge-SmartMEI/controller"
 	. "challenge-SmartMEI/controller/dto"
 	"encoding/json"
-	"strconv"
 
 	httping "github.com/ednailson/httping-go"
 	"github.com/go-playground/validator/v10"
@@ -28,11 +27,7 @@ func (c *Handler) Handle(request httping.HttpRequest) httping.IResponse {
 	if err != nil {
 		return httping.BadRequest(map[string]string{"body": err.Error()})
 	}
-	v, err := strconv.Atoi(request.Params["userid"])
-	if err != nil {
-		return httping.BadRequest(map[string]string{"body": err.Error()})
-	}
-	bookAdded, err := c.ctl.AddBookToMyCollection(v, book)
+	bookAdded, err := c.ctl.AddBookToMyCollection(request.Params["userid"], book)
 	if err != nil {
 		return httping.InternalServerError("Error to add book")
 	}

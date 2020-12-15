@@ -13,5 +13,5 @@ type Collection interface {
 	AddBookToMyCollection(user User, data Book) (*Book, error)
 	LendBook(fromUser User, toUser User, data BookLoan) (*BookLoan, error)
 	ReturnBook(user User, fromUser User) error
-	GetUserDetails(loggedUserId int) (*User, error)
+	GetUserDetails(loggedUserId string) (*User, error)
 }

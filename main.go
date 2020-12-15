@@ -17,9 +17,9 @@ func main() {
 	var flagFileName string
 	log.SetFormatter(&log.JSONFormatter{})
 	cliApp := cli.NewApp()
-	cliApp.Name = "Test"
-	cliApp.Description = "Challenge for HASH by Ednailson Junior"
-	cliApp.Version = "Version"
+	cliApp.Name = "SmartMEI"
+	cliApp.Description = "Challenge SmartMEI by Vinicius Cardozo"
+	cliApp.Version = "1.0"
 	cliApp.EnableBashCompletion = true
 	cliApp.Commands = []cli.Command{
 		{

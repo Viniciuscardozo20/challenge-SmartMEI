@@ -2,7 +2,6 @@ package returnBook
 
 import (
 	"challenge-SmartMEI/controller"
-	"strconv"
 
 	httping "github.com/ednailson/httping-go"
 	"github.com/go-playground/validator/v10"
@@ -17,15 +16,7 @@ func NewHandler(ctl controller.Controller) *Handler {
 }
 
 func (c *Handler) Handle(request httping.HttpRequest) httping.IResponse {
-	userId, err := strconv.Atoi(request.Params["userid"])
-	if err != nil {
-		return httping.BadRequest(map[string]string{"body": err.Error()})
-	}
-	bookId, err := strconv.Atoi(request.Params["bookid"])
-	if err != nil {
-		return httping.BadRequest(map[string]string{"body": err.Error()})
-	}
-	returnedBook, err := c.ctl.ReturnBook(userId, bookId)
+	returnedBook, err := c.ctl.ReturnBook(request.Params["userid"], request.Params["bookid"])
 	if err != nil {
 		return httping.InternalServerError("Error to return book")
 	}

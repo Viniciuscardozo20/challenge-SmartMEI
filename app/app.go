@@ -49,14 +49,14 @@ func (a *App) Close() {
 func loadServer(ctrl *controller.Controller) httping.IServer {
 	server := httping.NewHttpServer("", 8082)
 	createUserHandler := createUser.NewHandler(*ctrl)
-	server.NewRoute(nil, "/createUser").POST(createUserHandler.Handle)
+	server.NewRoute(nil, "/v1/createUser").POST(createUserHandler.Handle)
 	addBookHandler := addBook.NewHandler(*ctrl)
-	server.NewRoute(nil, "/addBook/:userid").POST(addBookHandler.Handle)
+	server.NewRoute(nil, "/v1/addBook/:userid").POST(addBookHandler.Handle)
 	lendBookHandler := lendBook.NewHandler(*ctrl)
-	server.NewRoute(nil, "/lendBook/:userid").POST(lendBookHandler.Handle)
+	server.NewRoute(nil, "/v1/lendBook/:userid").POST(lendBookHandler.Handle)
 	returnBookHandler := returnBook.NewHandler(*ctrl)
-	server.NewRoute(nil, "/returnBook/:userid/:bookid").POST(returnBookHandler.Handle)
+	server.NewRoute(nil, "/v1/returnBook/:userid/:bookid").POST(returnBookHandler.Handle)
 	getUserHandler := getUser.NewHandler(*ctrl)
-	server.NewRoute(nil, "/getUser/:userid").GET(getUserHandler.Handle)
+	server.NewRoute(nil, "/v1/getUser/:userid").GET(getUserHandler.Handle)
 	return server
 }

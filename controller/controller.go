@@ -22,6 +22,7 @@ func (c *Controller) CreateUser(input dto.CreateUserInput) (*models.User, error)
 	var userInput = models.User{
 		Name:          input.Name,
 		Email:         input.Email,
+		Collection:    make([]models.Book, 0),
 		LentBooks:     make([]models.BookLoan, 0),
 		BorrowedBooks: make([]models.BookLoan, 0),
 	}
@@ -32,7 +33,7 @@ func (c *Controller) CreateUser(input dto.CreateUserInput) (*models.User, error)
 	return user, nil
 }
 
-func (c *Controller) GetUserDetails(loggedUserId int) (*models.User, error) {
+func (c *Controller) GetUserDetails(loggedUserId string) (*models.User, error) {
 	user, err := c.coll.GetUserDetails(loggedUserId)
 	if err != nil {
 		return nil, err
@@ -40,7 +41,7 @@ func (c *Controller) GetUserDetails(loggedUserId int) (*models.User, error) {
 	return user, nil
 }
 
-func (c *Controller) AddBookToMyCollection(loggedUserId int, input dto.AddBookInput) (*models.Book, error) {
+func (c *Controller) AddBookToMyCollection(loggedUserId string, input dto.AddBookInput) (*models.Book, error) {
 	user, err := c.coll.GetUserDetails(loggedUserId)
 	if err != nil {
 		return nil, err
@@ -57,7 +58,7 @@ func (c *Controller) AddBookToMyCollection(loggedUserId int, input dto.AddBookIn
 	return book, nil
 }
 
-func (c *Controller) LendBook(loggedUserId int, input dto.LendBookInput) (*models.BookLoan, error) {
+func (c *Controller) LendBook(loggedUserId string, input dto.LendBookInput) (*models.BookLoan, error) {
 	user, err := c.coll.GetUserDetails(loggedUserId)
 	if err != nil {
 		return nil, err
@@ -98,7 +99,7 @@ func (c *Controller) LendBook(loggedUserId int, input dto.LendBookInput) (*model
 	return bookLoan, nil
 }
 
-func (c *Controller) ReturnBook(loggedUserId int, bookId int) (*models.BookLoan, error) {
+func (c *Controller) ReturnBook(loggedUserId string, bookId string) (*models.BookLoan, error) {
 	user, err := c.coll.GetUserDetails(loggedUserId)
 	if err != nil {
 		return nil, err
