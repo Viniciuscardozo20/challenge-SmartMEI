@@ -223,7 +223,6 @@ METÓDO `POST`
 No terminal execute
 
     curl --location --request POST 'http://localhost:8082/v1/returnBook/34/3823' \
-    --header 'Content-Type: application/json' \
 
 Ou em aluma outra interface tipo Postman ou Insomnia
 
