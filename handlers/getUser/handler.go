@@ -1,9 +1,7 @@
-package addBook
+package getUser
 
 import (
 	"challenge-SmartMEI/controller"
-	. "challenge-SmartMEI/controller/dto"
-	"encoding/json"
 	"strconv"
 
 	httping "github.com/ednailson/httping-go"
@@ -19,24 +17,15 @@ func NewHandler(ctl controller.Controller) *Handler {
 }
 
 func (c *Handler) Handle(request httping.HttpRequest) httping.IResponse {
-	var book AddBookInput
-	err := json.Unmarshal(request.Body, &book)
-	if err != nil {
-		return httping.BadRequest(map[string]string{"body": "invalid body"})
-	}
-	err = Validate(book)
+	userId, err := strconv.Atoi(request.Params["userid"])
 	if err != nil {
 		return httping.BadRequest(map[string]string{"body": err.Error()})
 	}
-	v, err := strconv.Atoi(request.Params["userid"])
+	user, err := c.ctl.GetUserDetails(userId)
 	if err != nil {
-		return httping.BadRequest(map[string]string{"body": err.Error()})
+		return httping.InternalServerError("Error to get user")
 	}
-	bookAdded, err := c.ctl.AddBookToMyCollection(v, book)
-	if err != nil {
-		return httping.InternalServerError("Error to add book")
-	}
-	return httping.OK(bookAdded)
+	return httping.OK(user)
 }
 
 func Validate(data interface{}) error {

@@ -1,4 +1,4 @@
-package addBook
+package lendBook
 
 import (
 	"challenge-SmartMEI/controller"
@@ -19,12 +19,12 @@ func NewHandler(ctl controller.Controller) *Handler {
 }
 
 func (c *Handler) Handle(request httping.HttpRequest) httping.IResponse {
-	var book AddBookInput
-	err := json.Unmarshal(request.Body, &book)
+	var lendBook LendBookInput
+	err := json.Unmarshal(request.Body, &lendBook)
 	if err != nil {
 		return httping.BadRequest(map[string]string{"body": "invalid body"})
 	}
-	err = Validate(book)
+	err = Validate(lendBook)
 	if err != nil {
 		return httping.BadRequest(map[string]string{"body": err.Error()})
 	}
@@ -32,11 +32,11 @@ func (c *Handler) Handle(request httping.HttpRequest) httping.IResponse {
 	if err != nil {
 		return httping.BadRequest(map[string]string{"body": err.Error()})
 	}
-	bookAdded, err := c.ctl.AddBookToMyCollection(v, book)
+	lendedBook, err := c.ctl.LendBook(v, lendBook)
 	if err != nil {
-		return httping.InternalServerError("Error to add book")
+		return httping.InternalServerError("Error to lend book")
 	}
-	return httping.OK(bookAdded)
+	return httping.OK(lendedBook)
 }
 
 func Validate(data interface{}) error {

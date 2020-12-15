@@ -3,6 +3,7 @@ package database
 import (
 	. "challenge-SmartMEI/database/models"
 	"context"
+	"math/rand"
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
@@ -58,6 +59,8 @@ func newCollection(name string, db mongo.Database) (*collection, error) {
 
 func (c *collection) CreateUser(data User) (*User, error) {
 	data.CreatedAt = time.Now()
+	rand.Seed(time.Now().Unix())
+	data.Id = rand.Intn(90000-10) + 10
 	result, err := c.coll.InsertOne(nil, data)
 	if err != nil {
 		return nil, err
@@ -70,6 +73,8 @@ func (c *collection) CreateUser(data User) (*User, error) {
 }
 
 func (c *collection) AddBookToMyCollection(user User, data Book) (*Book, error) {
+	rand.Seed(time.Now().Unix())
+	data.Id = rand.Intn(90000-10) + 10
 	user.Collection = append(user.Collection, data)
 	result := c.coll.FindOneAndUpdate(nil, bson.M{"email": user.Email}, bson.M{"$set": user})
 	if result.Err() != nil {

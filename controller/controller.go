@@ -32,6 +32,14 @@ func (c *Controller) CreateUser(input dto.CreateUserInput) (*models.User, error)
 	return user, nil
 }
 
+func (c *Controller) GetUserDetails(loggedUserId int) (*models.User, error) {
+	user, err := c.coll.GetUserDetails(loggedUserId)
+	if err != nil {
+		return nil, err
+	}
+	return user, nil
+}
+
 func (c *Controller) AddBookToMyCollection(loggedUserId int, input dto.AddBookInput) (*models.Book, error) {
 	user, err := c.coll.GetUserDetails(loggedUserId)
 	if err != nil {
@@ -61,7 +69,7 @@ func (c *Controller) LendBook(loggedUserId int, input dto.LendBookInput) (*model
 	exists := false
 	var book models.Book
 	for _, bookr := range user.Collection {
-		if book.Id == input.BookId {
+		if bookr.Id == input.BookId {
 			exists = true
 			book = bookr
 		}

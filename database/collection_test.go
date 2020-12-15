@@ -12,7 +12,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 )
 
-const testCollection = "test-collection-23"
+const testCollection = "test-collection-26"
 
 func TestCollection(t *testing.T) {
 	g := NewGomegaWithT(t)
@@ -45,7 +45,7 @@ func TestCollection(t *testing.T) {
 		rand := rand.Intn(80000-1+1) + 1
 		user, err := coll.CreateUser(User{
 			Name:          "testCreate",
-			Email:         fmt.Sprint("test0@email.com", rand),
+			Email:         fmt.Sprint("test043@email.com", rand),
 			Collection:    make([]Book, 0),
 			LentBooks:     make([]BookLoan, 0),
 			BorrowedBooks: make([]BookLoan, 0),

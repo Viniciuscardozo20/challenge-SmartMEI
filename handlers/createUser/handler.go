@@ -4,7 +4,6 @@ import (
 	"challenge-SmartMEI/controller"
 	. "challenge-SmartMEI/controller/dto"
 	"encoding/json"
-	"fmt"
 
 	httping "github.com/ednailson/httping-go"
 	"github.com/go-playground/validator/v10"
@@ -30,7 +29,6 @@ func (c *Handler) Handle(request httping.HttpRequest) httping.IResponse {
 	}
 	userCreated, err := c.ctl.CreateUser(user)
 	if err != nil {
-		fmt.Println(err.Error())
 		return httping.InternalServerError("Error to create user")
 	}
 	return httping.OK(userCreated)
