@@ -42,17 +42,57 @@ METÓDO `GET`v1/
 
 No terminal execute
 
-    curl --location --request GET 'http://localhost:8080/v1/convert?from=BTC&to=EUR&amount=123.45'
+    curl --location --request GET 'http://localhost:8082/v1/getUser/5421'
 
 Saída esperada
 
 _Status http_: `200 OK`
 ```json
 {
-	"status": "success",
-	"data": {
-		"result": 1984843.800252671
-	}
+  "status": "success",
+  "data": {
+    "id": "5fd8d7273722a1d48c225244",
+    "name": "teste01",
+    "email": "teste01@email.com.br",
+    "pages": "2020-12-15T15:32:55.909Z",
+    "collection": [
+      {
+        "id": "5e6e21ba-6fef-4a1c-b1c8-bc208992e6a1",
+        "title": "Livro 02",
+        "pages": "156",
+        "createdAt": "2020-12-15T15:33:10.848Z"
+      }
+    ],
+    "lentBooks": [
+      {
+        "book": {
+          "id": "5e6e21ba-6fef-4a1c-b1c8-bc208992e6a1",
+          "title": "Livro 02",
+          "pages": "156",
+          "createdAt": "2020-12-15T15:33:10.848Z"
+        },
+        "fromUser": "5fd8d7273722a1d48c225244",
+        "toUser": "5fd8d7563722a1d48c225245",
+        "lentAt": "2020-12-15T15:34:29.006Z",
+        "returnedAt": "2020-12-15T15:35:44.898Z",
+        "returned": true
+      },
+      {
+        "book": {
+          "id": "5e6e21ba-6fef-4a1c-b1c8-bc208992e6a1",
+          "title": "Livro 02",
+          "pages": "156",
+          "createdAt": "2020-12-15T15:33:10.848Z"
+        },
+        "fromUser": "5fd8d7273722a1d48c225244",
+        "toUser": "5fd8d7563722a1d48c225245",
+        "lentAt": "2020-12-15T15:36:17.056Z",
+        "returnedAt": "0001-01-01T00:00:00Z",
+        "returned": false
+      }
+    ],
+    "borrowedBooks": []
+  }
 }
 ```
 
