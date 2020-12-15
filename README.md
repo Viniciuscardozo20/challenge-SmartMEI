@@ -288,7 +288,7 @@ _Status http_: `200 OK`
 }
 ```
 
-### Requerementos
+### Requerimentos
 
 * GoLang 1:15
 
